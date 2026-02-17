@@ -7,28 +7,25 @@
     <title>Login – DJGST Travels Ticket Booking</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Merged and Optimized Styles */
         body {
-            /* Using your preferred gradient */
             background: linear-gradient(105deg, azure, peach);
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Changed from fixed height to min-height */
+            min-height: 100vh;
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Removed overflow: hidden to allow scrolling on small screens */
-            padding: 20px;
+            /* Removed overflow: hidden to allow scrolling if the keyboard pops up */
+            padding: 10px;
             box-sizing: border-box;
         }
 
         .flip-card {
             background-color: transparent;
             width: 100%;
-            max-width: 400px; /* Limits width on desktop */
-            height: 550px;    /* Set a fixed height for the flip effect to work well */
+            max-width: 400px;
+            height: 550px;
             perspective: 1000px;
-            margin: auto;
         }
 
         .flip-card-inner {
@@ -71,20 +68,6 @@
             filter: brightness(0.6);
         }
 
-        .flip-card-front {
-            color: white;
-        }
-
-        .flip-card-back {
-            color: white;
-            transform: rotateY(180deg);
-        }
-
-        .form-box {
-            z-index: 1;
-            width: 100%;
-        }
-
         .form-box h2 {
             margin-bottom: 20px;
             color: #fff;
@@ -99,7 +82,7 @@
             border-radius: 5px;
             outline: none;
             background: rgba(255,255,255,0.8);
-            box-sizing: border-box; /* Ensures padding doesn't break width */
+            box-sizing: border-box;
         }
 
         .btn {
@@ -114,6 +97,15 @@
             margin-top: 15px;
         }
 
+        .btn:hover {
+            background-color: #c0392b;
+        }
+
+        p {
+            color: white;
+            margin-top: 15px;
+        }
+
         span {
             color: white;
             cursor: pointer;
@@ -121,15 +113,8 @@
             text-decoration: underline;
         }
 
-        /* Mobile specific adjustment to ensure it doesn't get cut off */
-        @media (max-height: 600px) {
-            body {
-                align-items: flex-start;
-            }
-            .flip-card {
-                margin-top: 20px;
-                height: 500px;
-            }
+        .flip-card-back {
+            transform: rotateY(180deg);
         }
     </style>
 </head>
@@ -144,13 +129,13 @@
                     <source src="https://media.istockphoto.com/id/1390880690/cs/video/fantasy-asijsk%C3%BD-chr%C3%A1m-s-tajemn%C3%BDmi-sv%C4%9Btly.mp4?s=mp4-480x480-is&k=20&c=o-BrwdsydCjG9dv1HMZgM3k3V-AU0Yr8sKfnofeFOs0=" type="video/mp4">
                 </video>
 
-                <form class="form-box">
+                <div class="form-box">
                     <h2>Login</h2>
-                    <input id="email" type="email" placeholder="Email" required>
-                    <input id="password" type="password" placeholder="Password" required>
+                    <input id="loginEmail" type="email" placeholder="Email" required>
+                    <input id="loginPassword" type="password" placeholder="Password" required>
                     <button type="button" onclick="gg()" class="btn">Login</button>
                     <p>Don't have an account? <span onclick="toggleCard()">Sign Up</span></p>
-                </form>
+                </div>
             </div>
 
             <div class="flip-card-back">
@@ -158,35 +143,46 @@
                     <source src="https://media.istockphoto.com/id/2191135085/cs/video/4k-leteck%C3%BD-pohled-v-re%C3%A1ln%C3%A9m-%C4%8Dase-z%C3%A1b%C4%9Bry-slo%C5%BEit%C3%A9-d%C3%A1lni%C4%8Dn%C3%AD-silni%C4%8Dn%C3%AD-k%C5%99i%C5%BEovatky-s-dopravou.mp4?s=mp4-480x480-is&k=20&c=ebAaK2HUsx09aifha1Oq3LqNWpV46UKwYAICwAIkrY4=" type="video/mp4">
                 </video>
 
-                <form class="form-box">
+                <div class="form-box">
                     <h2>Sign Up</h2>
-                    <input type="text" placeholder="Full Name" required>
-                    <input type="email" placeholder="Email" required>
-                    <input type="password" placeholder="Password" required>
+                    <input id="regName" type="text" placeholder="Full Name" required>
+                    <input id="regEmail" type="email" placeholder="Email" required>
+                    <input id="regPassword" type="password" placeholder="Password" required>
                     <button type="button" onclick="signup()" class="btn">Create Account</button>
                     <p>Already have an account? <span onclick="toggleCard()">Login</span></p>
-                </form>
+                </div>
             </div>
 
         </div>
     </div>
 
     <script>
+        // Login Validation
         function gg() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+            const email = document.getElementById("loginEmail").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
 
             if (email !== "" && password !== "") {
                 alert("Your login is successful!");
-                window.location.href = "bookingtype.html"; // Redirect after successful alert
+                // This is where the navigation happens ONLY if fields are filled
+                window.location.href = "bookingtype.html";
             } else {
-                alert("Fill the details properly!!");
+                alert("Please fill in both Email and Password fields properly!");
             }
         }
 
+        // Signup Validation
         function signup() {
-            alert("Account created successfully!");
-            toggleCard();
+            const name = document.getElementById("regName").value.trim();
+            const email = document.getElementById("regEmail").value.trim();
+            const password = document.getElementById("regPassword").value.trim();
+
+            if (name !== "" && email !== "" && password !== "") {
+                alert("Account created successfully! You can now Login.");
+                toggleCard(); // Switch back to login side
+            } else {
+                alert("Please fill in all registration details!");
+            }
         }
 
         function toggleCard() {
@@ -197,4 +193,3 @@
 
 </body>
 </html>
-
