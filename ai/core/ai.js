@@ -930,10 +930,134 @@ ${currentMemory.from} → ${currentMemory.to}`
                     // ---------------------------------
 
                     const nearbyRoutes =
-                        await findNearbyRoutes(
-                            currentMemory.from,
-                            currentMemory.to
-                        );
+    await findNearbyRoutes(
+        currentMemory.from,
+        currentMemory.to
+    );
+
+
+// =====================================
+// VERIFY NEARBY ROUTES
+// =====================================
+//
+// IMPORTANT:
+//
+// findNearbyRoutes() may suggest a route,
+// but we only want to show routes where
+// Firestore actually contains active buses.
+//
+// Example:
+//
+// Rajahmundry → Vizag ❌
+// Samalkota → Vizag ❌
+//
+// If Firestore has no buses for them,
+// don't show them as alternatives.
+//
+// =====================================
+
+let verifiedNearbyRoutes = [];
+
+
+if (
+    Array.isArray(nearbyRoutes) &&
+    nearbyRoutes.length > 0
+) {
+
+    verifiedNearbyRoutes =
+        (
+            await Promise.all(
+
+                nearbyRoutes.map(
+                    async (route) => {
+
+                        try {
+
+                            const routeMemory = {
+
+                                ...currentMemory,
+
+                                from:
+                                    route.from,
+
+                                to:
+                                    route.to
+
+                            };
+
+
+                            const routeBuses =
+                                await busSearch.search(
+                                    routeMemory
+                                );
+
+
+                            console.log(
+                                "🔎 Nearby route verification:",
+                                route.from,
+                                "→",
+                                route.to,
+                                "Buses:",
+                                routeBuses.length
+                            );
+
+
+                            // ---------------------------------
+                            // KEEP ONLY ROUTES WITH REAL BUSES
+                            // ---------------------------------
+
+                            if (
+                                Array.isArray(routeBuses) &&
+                                routeBuses.length > 0
+                            ) {
+
+                                return {
+
+                                    ...route,
+
+                                    buses:
+                                        routeBuses
+
+                                };
+
+                            }
+
+
+                            // No buses → remove route
+
+                            return null;
+
+                        }
+
+                        catch (error) {
+
+                            console.error(
+                                "❌ Nearby route verification failed:",
+                                route,
+                                error
+                            );
+
+                            return null;
+
+                        }
+
+                    }
+
+                )
+
+            )
+        )
+        .filter(
+            route => route !== null
+        );
+
+}
+
+
+console.log(
+    "✅ Verified nearby routes:",
+    verifiedNearbyRoutes
+);
 
 
                     // ---------------------------------
@@ -941,14 +1065,14 @@ ${currentMemory.from} → ${currentMemory.to}`
                     // ---------------------------------
 
                     if (
-                        Array.isArray(nearbyRoutes) &&
-                        nearbyRoutes.length > 0
-                    ) {
+    Array.isArray(verifiedNearbyRoutes) &&
+    verifiedNearbyRoutes.length > 0
+) {
 
                         memoryStore.save(
-                            "pendingNearbyRoutes",
-                            nearbyRoutes
-                        );
+    "pendingNearbyRoutes",
+    verifiedNearbyRoutes
+);
 
 
                         memoryStore.save(
@@ -967,7 +1091,7 @@ ${currentMemory.from} → ${currentMemory.to}`
 `;
 
 
-                        nearbyRoutes.forEach(
+                        verifiedNearbyRoutes.forEach(
                             (route, index) => {
 
                                 reply +=
